@@ -1,2 +1,2 @@
 # Notification
-Genera un cuadro de notificación
+Genera un cuadro de notificación personalizado
