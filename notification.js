@@ -24,10 +24,11 @@ let Notification = {
 	box: null,
 	texto: "",
 
-	create: (texto, callback) => {
+	create: (texto, callback, background, time) => {
 		//Almacenamos la llamada de retorno
 		Notification.callback = callback || null;
 
+		//La notificación
 		Notification.box = document.createElement("span");
 		Notification.box.style.display = "block";
 		Notification.box.style.position = "fixed";
@@ -46,16 +47,56 @@ let Notification = {
 		Notification.box.style.cursor = "pointer";
 		Notification.box.style.boxShadow = "10px 10px 20px 5px grey";
 		Notification.box.style.transition = "all ease .35s";
+		Notification.box.style.zIndex = "9999";
 		Notification.interval = {};
 
+		//El fondo oscuro
+		Notification.back = document.createElement("div");
+		Notification.back.style.width = window.innerWidth * 50 + "px";
+		Notification.back.style.height = window.innerHeight * 50 + "px";
+		Notification.back.style.margin = 0;
+		Notification.back.style.backgroundColor = "black";
+		Notification.back.style.opacity = .95;
+		Notification.back.style.transition = "all ease .35s";
+		Notification.back.style.position = "absolute";
+		Notification.back.style.top = 0;	
+		Notification.back.style.left = 0;		
+		Notification.back.style.zIndex = "8888";
+
+		//La marca de tiempo actual
 		let now = new Date();
 		Notification.box.id = now.getTime();
 
+		//Comodín para decidir añadir el fondo oscuro
+		Notification.background = background;
+
+		//Tiempo en el que se mostrará la notificación
+		Notification.time = time;
+
+		//Al girar el dispositivo, cambian las dimensiones del fondo
+		window.addEventListener("orientationchange", Notification.resize, false);
+		window.addEventListener("resize", Notification.resize, false);
+
+		//Se añade el fondo oscuro si se solicita
+		if (Notification.background){
+			document.body.appendChild(Notification.back);
+			setTimeout(_ => document.body.style.overflow = "hidden", 200);
+		}
+
+		//Se añade la notificación
 		document.body.appendChild(Notification.box);
+
+		//Se muestra la notificación luego de 400 milésimas de segundo
 		setTimeout(() => Notification.show(Notification.box, texto, callback), 400);
 
+		//Se ocultan la notificación y el fondo al pulsar la notificación
 		Notification.box.addEventListener("click", function(){
-			Notification.hide(this);		
+			Notification.hide(this, Notification.background ? Notification.back : null);		
+		}, false);
+
+		//Se ocultan la notificación y el fondo al pulsar el fondo
+		Notification.back.addEventListener("click", function(){
+			Notification.hide(Notification.box, Notification.background ? Notification.back : null);		
 		}, false);
 	},
 
@@ -65,17 +106,23 @@ let Notification = {
 		box.className = "show";		
 
 		Notification.interval[box.id] = setTimeout(() => {
-			Notification.hide(box);
-		}, 4000);
+			Notification.hide(box, Notification.background ? Notification.back : null);
+		}, Notification.time);
 	},
 
-	hide: (box, callback) => {
+	hide: (box, back) => {
 		//Se oculta la notificación
 		box.style.left = "-30rem";
 		box.className = "hide";
 
 		//Se limpia el temporizador
 		Notification.interval[box.id] && clearTimeout(Notification.interval[box.id]);
+
+		//Si se está mostrando un fondo oscuro, se lo quita
+		if (Notification.background){
+			document.body.removeChild(Notification.back);
+			document.body.style.overflow = "auto";
+		}
 
 		//Se ejecuta la llamada de retorno (si es que hay una y es una función)
 		Notification.callback && {}.toString.call(Notification.callback) == "[object Function]" && Notification.callback();
@@ -92,14 +139,22 @@ let Notification = {
 		}, 400);
 	},
 
+	resize: () => {
+		if (Notification.background){
+			Notification.back.style.width = window.innerWidth + "px";
+			Notification.back.style.height = window.innerHeight + "px";
+			Notification.back.style.top = 0;	
+		}
+	},
+
 	relocate: () => {
-		let boxes = document.querySelectorAll(".show");
+		let boxes = document.querySelectorAll("span:not(#open).show");
 		return boxes.length ? boxes[0].offsetHeight * boxes.length + 8 + "px" : ".5rem";
 	},
 
-	msg: (texto, callback) => {
+	msg: (texto, callback, background, time) => {
 		if (texto.length){
-			Notification.create(texto, callback || null);
+			Notification.create(texto, callback || null, background || false, time || 4000);
 		}
 	}
 };
