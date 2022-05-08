@@ -47,7 +47,7 @@ let Notification = {
 		Notification.box.style.cursor = "pointer";
 		Notification.box.style.boxShadow = "10px 10px 20px 5px grey";
 		Notification.box.style.transition = "all ease .35s";
-		Notification.box.style.zIndex = "9999";
+		Notification.box.style.zIndex = "9000";
 		Notification.interval = {};
 
 		//El fondo oscuro
@@ -55,7 +55,7 @@ let Notification = {
 		Notification.back.style.width = window.innerWidth * 50 + "px";
 		Notification.back.style.height = window.innerHeight * 50 + "px";
 		Notification.back.style.margin = 0;
-		Notification.back.style.backgroundColor = "black";
+		Notification.back.style.backgroundColor = "#708090";
 		Notification.back.style.opacity = .95;
 		Notification.back.style.transition = "all ease .35s";
 		Notification.back.style.position = "absolute";
@@ -65,7 +65,7 @@ let Notification = {
 
 		//La marca de tiempo actual
 		let now = new Date();
-		Notification.box.id = now.getTime();
+		Notification.box.id = "notification" + now.getTime();
 
 		//Comodín para decidir añadir el fondo oscuro
 		Notification.background = background;
@@ -91,12 +91,12 @@ let Notification = {
 
 		//Se ocultan la notificación y el fondo al pulsar la notificación
 		Notification.box.addEventListener("click", function(){
-			Notification.hide(this, Notification.background ? Notification.back : null);		
+			Notification.hide(this.id, Notification.background ? Notification.back : null);		
 		}, false);
 
 		//Se ocultan la notificación y el fondo al pulsar el fondo
 		Notification.back.addEventListener("click", function(){
-			Notification.hide(Notification.box, Notification.background ? Notification.back : null);		
+			Notification.hide(Notification.box.id, Notification.background ? Notification.back : null);		
 		}, false);
 	},
 
@@ -106,17 +106,19 @@ let Notification = {
 		box.className = "show";		
 
 		Notification.interval[box.id] = setTimeout(() => {
-			Notification.hide(box, Notification.background ? Notification.back : null);
+			Notification.hide(box.id, Notification.background ? Notification.back : null);
 		}, Notification.time);
 	},
 
-	hide: (box, back) => {
+	hide: (boxId, back) => {
 		//Se oculta la notificación
+		let box = document.querySelector("#" + boxId);
+
 		box.style.left = "-30rem";
-		box.className = "hide";
+		setTimeout(_ => box.remove(), 400);
 
 		//Se limpia el temporizador
-		Notification.interval[box.id] && clearTimeout(Notification.interval[box.id]);
+		Notification.interval[boxId] && clearTimeout(Notification.interval[boxId]);
 
 		//Si se está mostrando un fondo oscuro, se lo quita
 		if (Notification.background){
@@ -129,7 +131,7 @@ let Notification = {
 
 		//Se desplaza las demás notificaciones hacia abajo (si es que hay más)
 		setTimeout(_ => {
-			let boxes = document.querySelectorAll(".show");
+			let boxes = document.querySelectorAll("[id^=notification]");
 
 			if (boxes){
 				[].forEach.call(boxes, (box) => {
@@ -148,13 +150,13 @@ let Notification = {
 	},
 
 	relocate: () => {
-		let boxes = document.querySelectorAll("span:not(#open).show");
+		let boxes = document.querySelectorAll("[id^=notification]");
 		return boxes.length ? boxes[0].offsetHeight * boxes.length + 8 + "px" : ".5rem";
 	},
 
 	msg: (texto, callback, background, time) => {
 		if (texto.length){
-			Notification.create(texto, callback || null, background || false, time || 4000);
+			Notification.create(texto, callback || null, background || false, time || 2000);
 		}
 	}
 };
