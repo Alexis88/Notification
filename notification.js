@@ -119,8 +119,10 @@ let Notification = {
 		//Se oculta la notificación
 		let box = document.querySelector("#" + boxId);
 
-		box && (box.style.left = "-30rem");
-		setTimeout(_ => box.remove(), 400);
+		if (box){
+			box.style.left = "-30rem";
+			setTimeout(_ => box.remove(), 400);
+		}
 
 		//Se limpia el temporizador
 		Notification.interval[boxId] && clearTimeout(Notification.interval[boxId]);
