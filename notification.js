@@ -110,12 +110,12 @@ let Notification = {
 
 		if (!Notification.keep){
 			Notification.interval[box.id] = setTimeout(_ => {
-				Notification.hide(box.id, Notification.background ? Notification.back : null);
+				Notification.hide(box.id);
 			}, Notification.time);
 		}
 	},
 
-	hide: (boxId, back) => {
+	hide: boxId => {
 		//Se oculta la notificación
 		let box = document.querySelector("#" + boxId);
 
