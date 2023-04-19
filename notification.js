@@ -24,7 +24,7 @@ let Notification = {
 	box: null,
 	texto: "",
 
-	create: (texto, callback, background, time) => {
+	create: (texto, callback, background, time, keep) => {
 		//Almacenamos la llamada de retorno
 		Notification.callback = callback || null;
 
@@ -47,7 +47,7 @@ let Notification = {
 		Notification.box.style.cursor = "pointer";
 		Notification.box.style.boxShadow = "10px 10px 20px 5px grey";
 		Notification.box.style.transition = "all ease .35s";
-		Notification.box.style.zIndex = "9000";
+		Notification.box.style.zIndex = "9999";
 		Notification.interval = {};
 
 		//El fondo oscuro
@@ -55,7 +55,7 @@ let Notification = {
 		Notification.back.style.width = window.innerWidth * 50 + "px";
 		Notification.back.style.height = window.innerHeight * 50 + "px";
 		Notification.back.style.margin = 0;
-		Notification.back.style.backgroundColor = "#708090";
+		Notification.back.style.backgroundColor = "black";
 		Notification.back.style.opacity = .95;
 		Notification.back.style.transition = "all ease .35s";
 		Notification.back.style.position = "absolute";
@@ -69,6 +69,9 @@ let Notification = {
 
 		//Comodín para decidir añadir el fondo oscuro
 		Notification.background = background;
+
+		//Comodín para decidir mantener o no la notificación
+		Notification.keep = keep;
 
 		//Tiempo en el que se mostrará la notificación
 		Notification.time = time;
@@ -90,12 +93,12 @@ let Notification = {
 		setTimeout(() => Notification.show(Notification.box, texto, callback), 400);
 
 		//Se ocultan la notificación y el fondo al pulsar la notificación
-		Notification.box.addEventListener("click", function(){
+		Notification.box.addEventListener("click", _ => {
 			Notification.hide(this.id, Notification.background ? Notification.back : null);		
 		}, false);
 
 		//Se ocultan la notificación y el fondo al pulsar el fondo
-		Notification.back.addEventListener("click", function(){
+		Notification.back.addEventListener("click", _ => {
 			Notification.hide(Notification.box.id, Notification.background ? Notification.back : null);		
 		}, false);
 	},
@@ -105,9 +108,11 @@ let Notification = {
 		box.style.left = "0rem";
 		box.className = "show";		
 
-		Notification.interval[box.id] = setTimeout(() => {
-			Notification.hide(box.id, Notification.background ? Notification.back : null);
-		}, Notification.time);
+		if (!Notification.keep){
+			Notification.interval[box.id] = setTimeout(() => {
+				Notification.hide(box.id, Notification.background ? Notification.back : null);
+			}, Notification.time);
+		}
 	},
 
 	hide: (boxId, back) => {
@@ -134,14 +139,14 @@ let Notification = {
 			let boxes = document.querySelectorAll("[id^=notification]");
 
 			if (boxes){
-				[].forEach.call(boxes, (box) => {
+				[...boxes].forEach(box => {
 					box.style.bottom = parseFloat(getComputedStyle(box).bottom) - box.offsetHeight + 8 + "px";
 				});
 			}
 		}, 400);
 	},
 
-	resize: () => {
+	resize: _ => {
 		if (Notification.background){
 			Notification.back.style.width = window.innerWidth + "px";
 			Notification.back.style.height = window.innerHeight + "px";
@@ -149,14 +154,14 @@ let Notification = {
 		}
 	},
 
-	relocate: () => {
+	relocate: _ => {
 		let boxes = document.querySelectorAll("[id^=notification]");
 		return boxes.length ? boxes[0].offsetHeight * boxes.length + 8 + "px" : ".5rem";
 	},
 
-	msg: (texto, callback, background, time) => {
+	msg: (texto, callback, background, time, keep) => {
 		if (texto.length){
-			Notification.create(texto, callback || null, background || false, time || 2000);
+			Notification.create(texto, callback || null, background || false, time || 2500, keep || false);
 		}
 	}
 };
