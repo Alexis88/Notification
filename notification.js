@@ -90,10 +90,10 @@ let Notification = {
 		document.body.appendChild(Notification.box);
 
 		//Se muestra la notificación luego de 400 milésimas de segundo
-		setTimeout(() => Notification.show(Notification.box, texto, callback), 400);
+		setTimeout(_ => Notification.show(Notification.box, texto, callback), 400);
 
 		//Se ocultan la notificación y el fondo al pulsar la notificación
-		Notification.box.addEventListener("click", _ => {
+		Notification.box.addEventListener("click", function(){
 			Notification.hide(this.id, Notification.background ? Notification.back : null);		
 		}, false);
 
@@ -109,7 +109,7 @@ let Notification = {
 		box.className = "show";		
 
 		if (!Notification.keep){
-			Notification.interval[box.id] = setTimeout(() => {
+			Notification.interval[box.id] = setTimeout(_ => {
 				Notification.hide(box.id, Notification.background ? Notification.back : null);
 			}, Notification.time);
 		}
