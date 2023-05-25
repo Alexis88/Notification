@@ -7,26 +7,31 @@
  * a la vez, las cuales se irán mostrando una sobre otra e irán desplazándose hacia abajo 
  * conforme las notificaciones anteriores vayan ocultándose.
  * 
- * MODO DE USO: Notification.msg("El mensaje a mostrar", Una función de llamada de retorno (opcional));
+ * MODO DE USO: Notification.msg({Opciones de configuración});
  * 
  * 
  * @author		Alexis López Espinoza
- * @version		1.0
- * @param		{mensaje}		String		El mensaje a mostrar en la notificación
- * @param		{callback}		Function	Una función de llamada de retorno que se ejecutará 
- * 											cuando se oculte la notificación. Esta llamada de 
- * 											retorno es opcional.
+ * @version		2.0
+ * @param		options			Plain Object
  */
 
 "use strict";
 
 let Notification = {
 	box: null,
-	texto: "",
-
-	create: (texto, callback, background, time, keep) => {
+	create: (
+		options
+		/*** OPCIONES DE CONFIGURACIÓN ***
+		 * 
+		 * options.texto: El texto a mostrar
+		 * options.callback: La llamada de retorno a ejecutarse luego de ocultarse la notificación
+		 * options.background: Determina si se mostrará un fondo oscuro mientra se muestra la notificación
+		 * options.time: El tiempo que se mostrará la notificación
+		 * options.keep: Determina si la notificación se mostrará permanentemente
+		 */
+	) => {
 		//Almacenamos la llamada de retorno
-		Notification.callback = callback || null;
+		Notification.callback = options.callback || null;
 
 		//La notificación
 		Notification.box = document.createElement("span");
@@ -55,7 +60,7 @@ let Notification = {
 		Notification.back.style.width = window.innerWidth * 50 + "px";
 		Notification.back.style.height = window.innerHeight * 50 + "px";
 		Notification.back.style.margin = 0;
-		Notification.back.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+		Notification.back.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
 		Notification.back.style.opacity = .95;
 		Notification.back.style.transition = "all ease .35s";
 		Notification.back.style.position = "absolute";
@@ -64,17 +69,16 @@ let Notification = {
 		Notification.back.style.zIndex = "8888";
 
 		//La marca de tiempo actual
-		let now = new Date();
-		Notification.box.id = "notification" + now.getTime();
+		Notification.box.id = `notification${new Date().getTime()}`;
 
 		//Comodín para decidir añadir el fondo oscuro
-		Notification.background = background;
+		Notification.background = options.background || false;
 
 		//Comodín para decidir mantener o no la notificación
-		Notification.keep = keep;
+		Notification.keep = options.keep || false;
 
 		//Tiempo en el que se mostrará la notificación
-		Notification.time = time;
+		Notification.time = options.time || 3000;
 
 		//Al girar el dispositivo, cambian las dimensiones del fondo
 		window.addEventListener("orientationchange", Notification.resize, false);
@@ -90,7 +94,7 @@ let Notification = {
 		document.body.appendChild(Notification.box);
 
 		//Se muestra la notificación luego de 400 milésimas de segundo
-		setTimeout(_ => Notification.show(Notification.box, texto, callback), 400);
+		setTimeout(_ => Notification.show(Notification.box, options.texto || "", options.callback), 400);
 
 		//Se ocultan la notificación y el fondo al pulsar la notificación
 		Notification.box.addEventListener("click", function(){
@@ -117,7 +121,7 @@ let Notification = {
 
 	hide: boxId => {
 		//Se oculta la notificación
-		let box = document.querySelector("#" + boxId);
+		let box = document.querySelector(`#${boxId}`);
 
 		if (box){
 			box.style.left = "-30rem";
@@ -163,7 +167,7 @@ let Notification = {
 
 	msg: (texto, callback, background, time, keep) => {
 		if (texto.length){
-			Notification.create(texto, callback || null, background || false, time || 2500, keep || false);
+			Notification.create(texto || "", callback || null, background || false, time || 3000, keep || false);
 		}
 	}
 };
