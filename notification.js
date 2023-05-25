@@ -167,7 +167,7 @@ let Notification = {
 
 	msg: (texto, callback, background, time, keep) => {
 		if (texto.length){
-			Notification.create(texto || "", callback || null, background || false, time || 3000, keep || false);
+			Notification.create(texto, callback || null, background || false, time || 3000, keep || false);
 		}
 	}
 };
