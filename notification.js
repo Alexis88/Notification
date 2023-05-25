@@ -19,7 +19,7 @@
 
 let Notification = {
 	box: null,
-	create: (
+	msg: (
 		options
 		/*** OPCIONES DE CONFIGURACIÓN ***
 		 * 
@@ -74,6 +74,9 @@ let Notification = {
 		//Comodín para decidir añadir el fondo oscuro
 		Notification.background = options.background || false;
 
+		//Texto a mostrar
+		Notification.texto = options.texto || "";
+
 		//Comodín para decidir mantener o no la notificación
 		Notification.keep = options.keep || false;
 
@@ -94,7 +97,7 @@ let Notification = {
 		document.body.appendChild(Notification.box);
 
 		//Se muestra la notificación luego de 400 milésimas de segundo
-		setTimeout(_ => Notification.show(Notification.box, options.texto || "", options.callback), 400);
+		setTimeout(_ => Notification.show(Notification.box, Notification.texto, Notification.callback), 400);
 
 		//Se ocultan la notificación y el fondo al pulsar la notificación
 		Notification.box.addEventListener("click", function(){
@@ -109,13 +112,11 @@ let Notification = {
 
 	show: (box, texto, callback) => {
 		box.innerHTML = texto;
-		box.style.left = "0rem";
+		box.style.left = 0;
 		box.className = "show";		
 
 		if (!Notification.keep){
-			Notification.interval[box.id] = setTimeout(_ => {
-				Notification.hide(box.id);
-			}, Notification.time);
+			Notification.interval[box.id] = setTimeout(_ => Notification.hide(box.id), Notification.time);
 		}
 	},
 
@@ -163,11 +164,5 @@ let Notification = {
 	relocate: _ => {
 		let boxes = document.querySelectorAll("[id^=notification]");
 		return boxes.length ? boxes[0].offsetHeight * boxes.length + 8 + "px" : ".5rem";
-	},
-
-	msg: (texto, callback, background, time, keep) => {
-		if (texto.length){
-			Notification.create(texto, callback || null, background || false, time || 3000, keep || false);
-		}
-	}
+	}	
 };
