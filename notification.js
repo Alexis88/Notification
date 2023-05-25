@@ -18,7 +18,6 @@
 "use strict";
 
 let Notification = {
-	box: null,
 	msg: (
 		options
 		/*** OPCIONES DE CONFIGURACIÓN ***
