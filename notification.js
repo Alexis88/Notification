@@ -12,13 +12,13 @@
  * 
  * @author		Alexis López Espinoza
  * @version		2.0
- * @param		options			Plain Object
+ * @param		options			Plain Object/String
  */
 
 "use strict";
 
 let Notification = {
-	msg: (
+	msg: function(
 		options
 		/*** OPCIONES DE CONFIGURACIÓN ***
 		 * 
@@ -28,9 +28,18 @@ let Notification = {
 		 * options.time: El tiempo que se mostrará la notificación
 		 * options.keep: Determina si la notificación se mostrará permanentemente
 		 */
-	) => {
+	){
+		//Si se recibe solo un argumento y es una cadena de texto, se descarta el uso del objeto con las opciones de configuración
+		if (arguments.length === 1 && {}.toString.call(arguments[0]) === "[object String]"){
+			Notification.text = options;
+		}
+		//Caso contrario, se conserva el objeto con las opciones de configuración
+		else{
+			Notification.options = options;
+		}
+
 		//Almacenamos la llamada de retorno
-		Notification.callback = options.callback || null;
+		Notification.callback = Notification.options?.callback || null;
 
 		//La notificación
 		Notification.box = document.createElement("span");
@@ -71,16 +80,16 @@ let Notification = {
 		Notification.box.id = `notification${new Date().getTime()}`;
 
 		//Comodín para decidir añadir el fondo oscuro
-		Notification.background = options.background || false;
+		Notification.background = Notification.options?.background || false;
 
 		//Texto a mostrar
-		Notification.texto = options.texto || "";
+		Notification.texto = Notification.options?.texto || Notification.text;
 
 		//Comodín para decidir mantener o no la notificación
-		Notification.keep = options.keep || false;
+		Notification.keep = Notification.options?.keep || false;
 
 		//Tiempo en el que se mostrará la notificación
-		Notification.time = options.time || 3000;
+		Notification.time = Notification.options?.time || 3000;
 
 		//Al girar el dispositivo, cambian las dimensiones del fondo
 		window.addEventListener("orientationchange", Notification.resize, false);
