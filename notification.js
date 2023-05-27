@@ -1,5 +1,5 @@
 /**
- * Notification personalizado
+ * NOTIFICACIONES PERSONALIZADAS
  * 
  * Este script genera un cuadro de notificación. Se muestra en la esquina inferior 
  * izquierda de la pantalla del dispositivo, ocultándose automáticamente después de 
@@ -7,7 +7,7 @@
  * a la vez, las cuales se irán mostrando una sobre otra e irán desplazándose hacia abajo 
  * conforme las notificaciones anteriores vayan ocultándose.
  * 
- * MODO DE USO: Notification.msg({Opciones de configuración});
+ * MODO DE USO: Notification.msg("Texto a mostrar"/{Objeto de opciones de configuración});
  * 
  * 
  * @author		Alexis López Espinoza
@@ -29,13 +29,17 @@ let Notification = {
 		 * options.keep: Determina si la notificación se mostrará permanentemente
 		 */
 	){
-		//Si se recibe solo un argumento y es una cadena de texto, se descarta el uso del objeto con las opciones de configuración
-		if (arguments.length === 1 && {}.toString.call(arguments[0]) === "[object String]"){
+		//Si se recibe una cadena de texto como argumento, se descarta el uso del objeto con las opciones de configuración
+		if (arguments.length && {}.toString.call(arguments[0]) === "[object String]"){
 			Notification.text = options;
 		}
-		//Caso contrario, se conserva el objeto con las opciones de configuración
-		else{
+		//Si se recibe un objeto como argumento, se conserva el objeto con las opciones de configuración
+		else if (arguments.length && {}.toString.call(arguments[0]) === "[object Object]"){
 			Notification.options = options;
+		}
+		//Caso contrario, se aborta la ejecución
+		else{
+			return;
 		}
 
 		//Almacenamos la llamada de retorno
@@ -46,7 +50,7 @@ let Notification = {
 		Notification.box.style.display = "block";
 		Notification.box.style.position = "fixed";
 		Notification.box.style.width = "250px";
-		Notification.box.style.backgroundColor = "snow";
+		Notification.box.style.backgroundColor = "#FFFFEF";
 		Notification.box.style.color = "#262626";
 		Notification.box.style.textAlign = "center";
 		Notification.box.style.fontWeight = "bold";
