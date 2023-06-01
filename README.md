@@ -1,2 +1,2 @@
 # Notification
-Cuadro de notificación minimalista
+Cuadro de notificación personalizado minimalista
