@@ -11,15 +11,16 @@
  * 
  * 
  * @author		Alexis López Espinoza
- * @version		2.0
+ * @version		3.0
  * @param		options			Plain Object/String
  */
 
 "use strict";
 
-let Notification = {
+const Notification = {
 	msg: function(
 		options
+
 		/*** OPCIONES DE CONFIGURACIÓN ***
 		 * 
 		 * options.texto: El texto a mostrar
@@ -30,151 +31,197 @@ let Notification = {
 		 */
 	){
 		//Si se recibe una cadena de texto como argumento, se descarta el uso del objeto con las opciones de configuración
-		if (arguments.length && {}.toString.call(arguments[0]) === "[object String]"){
-			Notification.text = options;
-		}
-		//Si se recibe un objeto como argumento, se conserva el objeto con las opciones de configuración
-		else if (arguments.length && {}.toString.call(arguments[0]) === "[object Object]"){
-			Notification.options = options;
+		if (arguments.length){
+			if ({}.toString.call(arguments[0]) !== "[object Object]" && String(arguments[0]).length){
+				//Texto a mostrar
+				Notification.text = options;
+			}
+			//Si se recibe un objeto como argumento, se conserva el objeto con las opciones de configuración
+			else if ({}.toString.call(arguments[0]) === "[object Object]"){
+				//Opciones de configuración
+				Notification.options = options;
+
+				//Texto a mostrar
+				Notification.text = options.texto;
+			}
 		}
 		//Caso contrario, se aborta la ejecución
 		else{
+			throw new Error("Tiene que añadir un texto o un objeto con opciones de configuración para poder mostrar la notificación");
 			return;
-		}
+		}		
 
-		//Almacenamos la llamada de retorno
-		Notification.callback = Notification.options?.callback || null;
+		//Llamada de retorno
+		Notification.callback = options.callback && {}.toString.call(options.callback) === "[object Function]" ? options.callback : null;
 
-		//La notificación
+		//Fondo
+		Notification.background = options.background || false;
+
+		//Tiempo por defecto durante el cual se mostrará la notificación
+		Notification.time = options.time || 3000;
+
+		//Determinar si la notificación se mostrará permanentemente
+		Notification.keep = options.keep || false;
+
+		//Se ejecuta el método que muestra el cuadro de notificación
+		Notification.show();
+	},
+
+	show: _ => {
+		//Cuadro de la notificación
 		Notification.box = document.createElement("span");
-		Notification.box.style.display = "block";
-		Notification.box.style.position = "fixed";
-		Notification.box.style.width = "250px";
+		Notification.box.classList.add("notification-box");
 		Notification.box.style.backgroundColor = "#FFFFEF";
-		Notification.box.style.color = "#262626";
-		Notification.box.style.textAlign = "center";
-		Notification.box.style.fontWeight = "bold";
-		Notification.box.style.padding = "1rem .7rem";
-		Notification.box.style.userSelect = "none";
+		Notification.box.style.width = window.innerWidth >= 850 ? "250px" : "200px";
+		Notification.box.style.padding = "1rem .75rem";
+		Notification.box.style.display = "flex";
+		Notification.box.style.alignItems = "center";
+		Notification.box.style.justifyContent = "center";
+		Notification.box.style.position = "fixed";
 		Notification.box.style.left = "-30rem";		
-		Notification.box.style.bottom = Notification.relocate();
+		Notification.box.style.fontSize = "1rem !important";
+		Notification.box.style.textAlign = "justify";
+		Notification.box.style.userSelect = "none";
 		Notification.box.style.wordWrap = "break-word";
 		Notification.box.style.overflowY = "auto";
 		Notification.box.style.overflowX = "hidden";
-		Notification.box.style.cursor = "pointer";
 		Notification.box.style.boxShadow = "10px 10px 20px 5px grey";
-		Notification.box.style.transition = "all ease .35s";
-		Notification.box.style.zIndex = "9999";
-		Notification.interval = {};
+		Notification.box.style.transition = ".4s ease";
+		Notification.box.style.zIndex = "9999";		
 
-		//El fondo oscuro
+		//Fondo oscuro
 		Notification.back = document.createElement("div");
 		Notification.back.style.width = window.innerWidth * 50 + "px";
 		Notification.back.style.height = window.innerHeight * 50 + "px";
 		Notification.back.style.margin = 0;
 		Notification.back.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
-		Notification.back.style.opacity = .95;
-		Notification.back.style.transition = "all ease .35s";
+		Notification.back.style.transition = ".4s ease";
 		Notification.back.style.position = "absolute";
 		Notification.back.style.top = 0;	
-		Notification.back.style.left = 0;		
+		Notification.back.style.left = 0;	
 		Notification.back.style.zIndex = "8888";
 
-		//La marca de tiempo actual
-		Notification.box.id = `notification${new Date().getTime()}`;
+		//Se recupera o genera una nueva cola de notificaciones
+		Notification.queue = Notification.queue || [];
 
-		//Comodín para decidir añadir el fondo oscuro
-		Notification.background = Notification.options?.background || false;
+		//Se genera una copia de la configuración de la notificación
+		let copy = {...Notification};
 
-		//Texto a mostrar
-		Notification.texto = Notification.options?.texto || Notification.text;
+		//Se elimina la cola de la copia
+		delete copy.queue;
 
-		//Comodín para decidir mantener o no la notificación
-		Notification.keep = Notification.options?.keep || false;
+		//Se encola la notificación
+		Notification.queue.push(copy);
 
-		//Tiempo en el que se mostrará la notificación
-		Notification.time = Notification.options?.time || 3000;
+		//Se verifica si se añadirá el fondo oscuro
+		Notification.addBackground(copy);
 
-		//Al girar el dispositivo, cambian las dimensiones del fondo
-		window.addEventListener("orientationchange", Notification.resize, false);
-		window.addEventListener("resize", Notification.resize, false);
+		//Se muestra el cuadro de notificación
+		Notification.addBox(copy);
 
-		//Se añade el fondo oscuro si se solicita
-		if (Notification.background){
-			document.body.appendChild(Notification.back);
-			setTimeout(_ => document.body.style.overflow = "hidden", 200);
-		}
+		//Se verifica si la notificación se mostrará por unos segundos o permanentemente
+		Notification.showTime(copy);
 
-		//Se añade la notificación
-		document.body.appendChild(Notification.box);
+		//Se oculta la notificación en caso de que se haga clic sobre ella
+		copy.box.addEventListener("click", _ => Notification.hide(copy), false);
 
-		//Se muestra la notificación luego de 400 milésimas de segundo
-		setTimeout(_ => Notification.show(Notification.box, Notification.texto, Notification.callback), 400);
+		//Se ocultan la notificación y el fondo en caso de que se haga clic sobre este último
+		copy.back.addEventListener("click", _ => Notification.hide(copy), false);
 
-		//Se ocultan la notificación y el fondo al pulsar la notificación
-		Notification.box.addEventListener("click", function(){
-			Notification.hide(this.id, Notification.background ? Notification.back : null);		
-		}, false);
+		//Se mostrará el cursor con forma de mano cuando se pose el cursor sobre la notificación
+		copy.box.addEventListener("mouseover", _ => copy.box.style.cursor = "pointer", false);
 
-		//Se ocultan la notificación y el fondo al pulsar el fondo
-		Notification.back.addEventListener("click", _ => {
-			Notification.hide(Notification.box.id, Notification.background ? Notification.back : null);		
-		}, false);
+		//Se retirará el cursor con forma de mano cuando se retire el cursor de la notificación
+		copy.box.addEventListener("mouseout", _ => copy.box.style.cursor = "auto", false);
+
+		//Al girar el dispositivo, cambiarán las dimensiones del fondo
+		window.addEventListener("orientationchange", _ => Notification.resizeBack(copy), false);
+		window.addEventListener("resize", _ => Notification.resizeBack(copy), false);
 	},
 
-	show: (box, texto, callback) => {
-		box.innerHTML = texto;
-		box.style.left = 0;
-		box.className = "show";		
-
-		if (!Notification.keep){
-			Notification.interval[box.id] = setTimeout(_ => Notification.hide(box.id), Notification.time);
-		}
-	},
-
-	hide: boxId => {
-		//Se oculta la notificación
-		let box = document.querySelector(`#${boxId}`);
-
-		if (box){
-			box.style.left = "-30rem";
-			setTimeout(_ => box.remove(), 400);
-		}
-
-		//Se limpia el temporizador
-		Notification.interval[boxId] && clearTimeout(Notification.interval[boxId]);
-
-		//Si se está mostrando un fondo oscuro, se lo quita
-		if (Notification.background){
-			document.body.removeChild(Notification.back);
-			document.body.style.overflow = "auto";
-		}
-
-		//Se ejecuta la llamada de retorno (si es que hay una y es una función)
-		Notification.callback && {}.toString.call(Notification.callback) == "[object Function]" && Notification.callback();
-
-		//Se desplaza las demás notificaciones hacia abajo (si es que hay más)
+	addBox: boxConfig => {
+		boxConfig.box.innerHTML = boxConfig.text;
+		document.body.appendChild(boxConfig.box);
 		setTimeout(_ => {
-			let boxes = document.querySelectorAll("[id^=notification]");
+			boxConfig.box.style.left = 0;
+			
+			//Se posiciona la notificación verticalmente
+			Notification.bottom(boxConfig);
+		}, 400);
+	},
 
-			if (boxes){
-				[...boxes].forEach(box => {
-					box.style.bottom = parseFloat(getComputedStyle(box).bottom) - box.offsetHeight + 8 + "px";
-				});
+	addBackground: boxConfig => {
+		if (boxConfig.background){
+			//Se realiza una copia del valor de la propiedad "overflow" del documento
+			Notification.overflow = getComputedStyle(document.body).overflow;
+
+			document.body.appendChild(boxConfig.back);			
+			setTimeout(_ => document.body.style.overflow = "hidden");
+		}
+	},
+
+	showTime: boxConfig => {
+		if (!boxConfig.keep){
+			boxConfig.timer = setTimeout(_ => Notification.hide(boxConfig), Notification.time);
+		}
+	},
+
+	exists: _ => document.querySelectorAll(".notification-box"),
+
+	hide: boxConfig => {
+		boxConfig.box.style.left = "-30rem";
+
+		if (boxConfig.timer){
+			clearTimeout(boxConfig.timer);
+		}
+
+		if (boxConfig.callback){
+			boxConfig.callback();
+		}
+
+		setTimeout(_ => {
+			boxConfig.box.remove();
+			Notification.queue.splice(Notification.queue.indexOf(boxConfig), 1);
+
+			if (boxConfig.background){
+				document.body.style.overflow = Notification.overflow || "auto";
+			}
+
+			let boxes = Notification.exists();
+
+			if (Notification.queue.length){
+				Notification.queue.forEach(boxConfig => Notification.bottom(boxConfig));
 			}
 		}, 400);
 	},
 
-	resize: _ => {
-		if (Notification.background){
-			Notification.back.style.width = window.innerWidth + "px";
-			Notification.back.style.height = window.innerHeight + "px";
-			Notification.back.style.top = 0;	
+	hideAll: _ => Notification.queue.forEach(boxConfig => Notification.hide(boxConfig)),
+
+	resizeBack: boxConfig => {
+		if (boxConfig.background){
+			boxConfig.back.style.width = window.innerWidth * 50 + "px";
+			boxConfig.back.style.height = window.innerHeight * 50 + "px";
+			boxConfig.back.style.top = 0;	
 		}
 	},
 
-	relocate: _ => {
-		let boxes = document.querySelectorAll("[id^=notification]");
-		return boxes.length ? boxes[0].offsetHeight * boxes.length + 8 + "px" : ".5rem";
-	}	
+	bottom: boxConfig => {
+		let boxes = Notification.exists(),
+			order = Notification.queue.indexOf(boxConfig);
+
+		boxConfig.box.style.bottom = ((order, queue) => {
+			let totalHeight = 0;
+
+			if (order){
+				for (let i = 0; i < order; i++){
+					totalHeight += queue[i].box.offsetHeight + 8;
+				}
+			}
+			else if (order > -1){
+				return "1px";
+			}
+
+			return totalHeight + "px";
+		})(order, Notification.queue);
+	}
 };
