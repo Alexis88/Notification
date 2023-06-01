@@ -30,14 +30,14 @@ const Notification = {
 		 * options.keep: Determina si la notificación se mostrará permanentemente
 		 */
 	){
-		//Si se recibieron argumentos
+		//Si se recibió argumentos
 		if (arguments.length){
-			//Si se recibe una cadena de texto como argumento, se descarta el uso del objeto con las opciones de configuración
-			if ({}.toString.call(arguments[0]) !== "[object Object]" && String(arguments[0]).length){
+			//Si el argumento no es un objeto, se lo establece como el texto a mostrar
+			if ({}.toString.call(arguments[0]) !== "[object Object]"){
 				//Texto a mostrar
 				Notification.text = options;
 			}
-			//Si se recibe un objeto como argumento, se conserva el objeto con las opciones de configuración
+			//Si el argumento es un objeto, se lo establece como configuración de la notificación
 			else if ({}.toString.call(arguments[0]) === "[object Object]"){
 				//Opciones de configuración
 				Notification.options = options;
@@ -50,7 +50,7 @@ const Notification = {
 		else{
 			throw new Error("Tiene que añadir un texto o un objeto con opciones de configuración para poder mostrar la notificación");
 			return;
-		}	
+		}		
 
 		//Llamada de retorno
 		Notification.callback = options.callback && {}.toString.call(options.callback) === "[object Function]" ? options.callback : null;
