@@ -38,7 +38,7 @@ const Notification = {
 				Notification.text = options;
 			}
 			//Si el argumento es un objeto, se lo establece como configuración de la notificación
-			else if ({}.toString.call(arguments[0]) === "[object Object]"){
+			else{
 				//Opciones de configuración
 				Notification.options = options;
 
