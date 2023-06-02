@@ -18,9 +18,7 @@
 "use strict";
 
 const Notification = {
-	msg: function(
-		options
-
+	msg: options => {
 		/*** OPCIONES DE CONFIGURACIÓN ***
 		 * 
 		 * options.texto: El texto a mostrar
@@ -29,11 +27,14 @@ const Notification = {
 		 * options.time: El tiempo que se mostrará la notificación
 		 * options.keep: Determina si la notificación se mostrará permanentemente
 		 */
-	){
-		//Si se recibió argumentos
-		if (arguments.length){
+
+		//Se libera la memoria ocupada por la configuración anterior (si la hubo)
+		delete Notification.options;
+
+		//Si se recibió algún argumento
+		if (options){
 			//Si el argumento no es un objeto, se lo establece como el texto a mostrar
-			if ({}.toString.call(arguments[0]) !== "[object Object]"){
+			if ({}.toString.call(options) !== "[object Object]"){
 				//Texto a mostrar
 				Notification.text = options;
 			}
@@ -49,7 +50,6 @@ const Notification = {
 		//Caso contrario, se aborta la ejecución
 		else{
 			throw new Error("Tiene que añadir un texto o un objeto con opciones de configuración para poder mostrar la notificación");
-			return;
 		}		
 
 		//Llamada de retorno
@@ -70,53 +70,22 @@ const Notification = {
 
 	show: _ => {
 		//Cuadro de la notificación
-		Notification.box = document.createElement("span");
-		Notification.box.classList.add("notification-box");
-		Notification.box.style.backgroundColor = "#FFFFEF";
-		Notification.box.style.width = window.innerWidth >= 850 ? "250px" : "200px";
-		Notification.box.style.padding = "1rem .75rem";
-		Notification.box.style.display = "flex";
-		Notification.box.style.alignItems = "center";
-		Notification.box.style.justifyContent = "center";
-		Notification.box.style.position = "fixed";
-		Notification.box.style.left = "-30rem";		
-		Notification.box.style.fontSize = "1rem !important";
-		Notification.box.style.textAlign = "justify";
-		Notification.box.style.userSelect = "none";
-		Notification.box.style.wordWrap = "break-word";
-		Notification.box.style.overflowY = "auto";
-		Notification.box.style.overflowX = "hidden";
-		Notification.box.style.boxShadow = "10px 10px 20px 5px grey";
-		Notification.box.style.transition = ".4s ease";
-		Notification.box.style.zIndex = "9999";		
+		Notification.createBox();
 
-		//Fondo oscuro
-		Notification.back = document.createElement("div");
-		Notification.back.style.width = window.innerWidth * 50 + "px";
-		Notification.back.style.height = window.innerHeight * 50 + "px";
-		Notification.back.style.margin = 0;
-		Notification.back.style.backgroundColor = "#000";
-		Notification.back.style.opacity = 0;
-		Notification.back.style.transition = ".4s ease";
-		Notification.back.style.position = "absolute";
-		Notification.back.style.top = 0;	
-		Notification.back.style.left = 0;	
-		Notification.back.style.zIndex = "8888";
-
-		//Se recupera o genera una nueva cola de notificaciones
-		Notification.queue = Notification.queue || [];
+		//Si se ha establecido un fondo, se genera uno
+		Notification.background && Notification.createBack();
 
 		//Se genera una copia de la configuración de la notificación
-		let copy = {...Notification};
+		const copy = {...Notification};
 
-		//Se elimina la cola de la copia
-		delete copy.queue;
+		//Se recupera o genera una nueva cola de notificaciones
+		Notification.queue = Notification.queue || [];		
 
 		//Se encola la notificación
 		Notification.queue.push(copy);
 
-		//Se verifica si se añadirá el fondo oscuro
-		Notification.addBackground(copy);
+		//Si se ha establecido un fondo, se lo añade
+		Notification.background && Notification.addBackground(copy);
 
 		//Se muestra el cuadro de notificación
 		Notification.addBox(copy);
@@ -124,27 +93,61 @@ const Notification = {
 		//Se verifica si la notificación se mostrará por unos segundos o permanentemente
 		Notification.showTime(copy);
 
+		//Configuración de eventos
+		Notification.events(copy);		
+	},
+
+	events: boxConfig => {
 		//Se oculta la notificación en caso de que se haga clic sobre ella
-		copy.box.addEventListener("click", _ => Notification.hide(copy), false);
+		boxConfig.box.addEventListener("click", _ => Notification.hide(boxConfig), false);
 
 		//Se ocultan la notificación y el fondo en caso de que se haga clic sobre este último
-		copy.back.addEventListener("click", _ => Notification.hide(copy), false);
+		boxConfig.back?.addEventListener("click", _ => Notification.hide(boxConfig), false);
 
 		//Se mostrará el cursor con forma de mano cuando se pose el cursor sobre la notificación
-		copy.box.addEventListener("mouseover", _ => copy.box.style.cursor = "pointer", false);
+		boxConfig.box.addEventListener("mouseover", _ => boxConfig.box.style.cursor = "pointer", false);
 
 		//Se retirará el cursor con forma de mano cuando se retire el cursor de la notificación
-		copy.box.addEventListener("mouseout", _ => copy.box.style.cursor = "auto", false);
+		boxConfig.box.addEventListener("mouseout", _ => boxConfig.box.style.cursor = "auto", false);
 
 		//Al girar el dispositivo, cambiarán las dimensiones del fondo
-		window.addEventListener("orientationchange", _ => Notification.resizeBack(copy), false);
-		window.addEventListener("resize", _ => Notification.resizeBack(copy), false);
+		window.addEventListener("orientationchange", _ => Notification.resizeBack(boxConfig), false);
+		window.addEventListener("resize", _ => Notification.resizeBack(boxConfig), false);
+	},
+
+	createBox: _ => {
+		Notification.box = document.createElement("span");
+		Notification.box.classList.add("notification-box");
+		Notification.box.style = `
+			background-color: #FFFFEF;
+			width: ${window.innerWidth >= 850 ? "250px" : "200px"};
+			padding: 1rem .75rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: fixed;
+			left: -30rem;
+			font-size: 1rem !important;
+			text-align: justify;
+			user-select: none;
+			word-wrap: break-word;
+			overflow-x: hidden;
+			overflow-y: auto;
+			box-shadow: 10px 10px 20px 5px gray;
+			transition: .4s ease;
+			z-index: 9999;
+		`;
 	},
 
 	addBox: boxConfig => {
+		//Se añade el texto al cuadro de notificación
 		boxConfig.box.innerHTML = boxConfig.text;
+
+		//Se añade el cuadro de notificación al documento
 		document.body.appendChild(boxConfig.box);
+
 		setTimeout(_ => {
+			//Se muestra la notificación
 			boxConfig.box.style.left = 0;
 			
 			//Se posiciona la notificación verticalmente
@@ -152,15 +155,34 @@ const Notification = {
 		}, 400);
 	},
 
-	addBackground: boxConfig => {
-		if (boxConfig.background){
-			//Se realiza una copia del valor de la propiedad "overflow" del documento
-			boxConfig.overflow = getComputedStyle(document.body).overflow;
+	createBack: _ => {
+		Notification.back = document.createElement("div");
+		Notification.back.style = `
+			width: ${window.innerWidth * 50}px;
+			height: ${window.innerHeight * 50}px;
+			margin: 0;
+			background-color: #000;
+			opacity: 0;
+			transition: .4s ease;
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 8888;
+		`;
+	},
 
-			document.body.appendChild(boxConfig.back);
-			document.body.style.overflow = "hidden";
-			setTimeout(_ => boxConfig.back.style.opacity = .6, 400);			
-		}
+	addBackground: boxConfig => {
+		//Se realiza una copia del valor de la propiedad "overflow" del documento
+		boxConfig.overflow = getComputedStyle(document.body).overflow;
+
+		//Se añde el fondo al documento
+		document.body.appendChild(boxConfig.back);
+
+		//Se ocultan las barras de desplazamiento del documento
+		document.body.style.overflow = "hidden";
+
+		//Se le da visibilidad al fondo
+		setTimeout(_ => boxConfig.back.style.opacity = .6, 400);
 	},
 
 	showTime: boxConfig => {
@@ -206,15 +228,14 @@ const Notification = {
 
 	resizeBack: boxConfig => {
 		if (boxConfig.background){
-			boxConfig.back.style.width = window.innerWidth * 50 + "px";
-			boxConfig.back.style.height = window.innerHeight * 50 + "px";
-			boxConfig.back.style.top = 0;	
+			boxConfig.back.style.width = `${window.innerWidth * 50}px`;
+			boxConfig.back.style.height = `${window.innerHeight * 50}px`;
+			boxConfig.back.style.top = 0;
 		}
 	},
 
 	bottom: boxConfig => {
-		let boxes = Notification.exists(),
-			order = Notification.queue.indexOf(boxConfig);
+		const order = Notification.queue.indexOf(boxConfig);
 
 		boxConfig.box.style.bottom = ((order, queue) => {
 			let totalHeight = 0;
@@ -228,7 +249,7 @@ const Notification = {
 				return "1px";
 			}
 
-			return totalHeight + "px";
+			return `${totalHeight}px`;
 		})(order, Notification.queue);
 	}
 };
