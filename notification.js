@@ -157,15 +157,15 @@ const Notification = {
 			//Se realiza una copia del valor de la propiedad "overflow" del documento
 			boxConfig.overflow = getComputedStyle(document.body).overflow;
 
-			document.body.appendChild(boxConfig.back);		
-			boxConfig.back.style.opacity = .6;
-			setTimeout(_ => document.body.style.overflow = "hidden");
+			document.body.appendChild(boxConfig.back);
+			document.body.style.overflow = "hidden";
+			setTimeout(_ => boxConfig.back.style.opacity = .6, 400);			
 		}
 	},
 
 	showTime: boxConfig => {
 		if (!boxConfig.keep){
-			boxConfig.timer = setTimeout(_ => Notification.hide(boxConfig), Notification.time);
+			boxConfig.timer = setTimeout(_ => Notification.hide(boxConfig), boxConfig.time);
 		}
 	},
 
@@ -187,19 +187,18 @@ const Notification = {
 		}
 
 		setTimeout(_ => {
-			boxConfig.box.remove();
-			Notification.queue.splice(Notification.queue.indexOf(boxConfig), 1);
+			boxConfig.box.remove();			
 
 			if (boxConfig.background){
 				boxConfig.back.remove();
 				document.body.style.overflow = boxConfig.overflow || "auto";
 			}
 
-			let boxes = Notification.exists();
-
 			if (Notification.queue.length){
 				Notification.queue.forEach(boxConfig => Notification.bottom(boxConfig));
 			}
+
+			Notification.queue.splice(Notification.queue.indexOf(boxConfig), 1);
 		}, 400);
 	},
 
