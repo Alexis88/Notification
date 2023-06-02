@@ -95,7 +95,8 @@ const Notification = {
 		Notification.back.style.width = window.innerWidth * 50 + "px";
 		Notification.back.style.height = window.innerHeight * 50 + "px";
 		Notification.back.style.margin = 0;
-		Notification.back.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+		Notification.back.style.backgroundColor = "#000";
+		Notification.back.style.opacity = 0;
 		Notification.back.style.transition = ".4s ease";
 		Notification.back.style.position = "absolute";
 		Notification.back.style.top = 0;	
@@ -154,9 +155,10 @@ const Notification = {
 	addBackground: boxConfig => {
 		if (boxConfig.background){
 			//Se realiza una copia del valor de la propiedad "overflow" del documento
-			Notification.overflow = getComputedStyle(document.body).overflow;
+			boxConfig.overflow = getComputedStyle(document.body).overflow;
 
-			document.body.appendChild(boxConfig.back);			
+			document.body.appendChild(boxConfig.back);		
+			boxConfig.back.style.opacity = .6;
 			setTimeout(_ => document.body.style.overflow = "hidden");
 		}
 	},
@@ -172,6 +174,10 @@ const Notification = {
 	hide: boxConfig => {
 		boxConfig.box.style.left = "-30rem";
 
+		if (boxConfig.background){
+			boxConfig.back.style.opacity = 0;
+		}
+
 		if (boxConfig.timer){
 			clearTimeout(boxConfig.timer);
 		}
@@ -185,7 +191,8 @@ const Notification = {
 			Notification.queue.splice(Notification.queue.indexOf(boxConfig), 1);
 
 			if (boxConfig.background){
-				document.body.style.overflow = Notification.overflow || "auto";
+				boxConfig.back.remove();
+				document.body.style.overflow = boxConfig.overflow || "auto";
 			}
 
 			let boxes = Notification.exists();
