@@ -41,6 +41,8 @@ const Notification = {
 			throw new Error("Tiene que establecer un contenido para la notificación");
 		}
 
+		Notification.id = `notificationID-${new Date().getTime()}`;
+
 		if (Notification.type(options) == "[object String]"){
 			Notification.text = options;
 			Notification.background = false;
@@ -78,50 +80,8 @@ const Notification = {
 	},
 
 	createNotification(){
-		const 
-			back = document.createElement("div"),
-			box = document.createElement("span"),
-			width = window.innerWidth,
-			height = window.innerHeight;
-
-		back.style = `
-			position: absolute;
-			background-color: rgba(0, 0, 0, .6);
-			display: flex;
-			align-items: center;
-			width: ${width}px;
-			height: ${height}px;
-			top: 0;
-			left: 0;
-			justify-content: center;
-			z-index: 8888;
-			transition: all ease .4s;
-		`;
-
-		box.style = `
-			background-color: #FFFFEF;
-			width: ${width >= 850 ? "250px" : "200px"};
-			padding: 1rem .75rem;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			position: fixed;
-			left: -30rem;
-			font-size: 1rem !important;
-			text-align: justify;
-			user-select: none;
-			word-wrap: break-word;
-			overflow-x: hidden;
-			overflow-y: auto;
-			box-shadow: 10px 10px 20px 5px gray;
-			cursor: pointer;
-			transition: .4s ease;
-			z-index: 9999;
-		`;
-		box.innerHTML = Notification.text;
-
-		Notification.back = back;
-		Notification.box = box;	
+		Notification.back = Notification.createBack();
+		Notification.box = Notification.createBox(Notification.text);	
 		const cloneConfig = {...Notification};
 		Notification.queue.push(cloneConfig);
 
@@ -145,6 +105,59 @@ const Notification = {
 		return cloneConfig;
 	},
 
+	createBack(){
+		const 
+			back = document.createElement("div"),
+			width = window.innerWidth,
+			height = window.innerHeight;
+
+		back.style = `
+			position: absolute;
+			background-color: rgba(0, 0, 0, .6);
+			display: flex;
+			align-items: center;
+			width: ${width}px;
+			height: ${height}px;
+			top: 0;
+			left: 0;
+			justify-content: center;
+			z-index: 8888;
+			transition: all ease .4s;
+		`;
+
+		return back;
+	},
+
+	createBox(text){
+		const 
+			box = document.createElement("span"),
+			width = window.innerWidth;
+
+		box.style = `
+			background-color: #FFFFEF;
+			width: ${width >= 850 ? "250px" : "200px"};
+			padding: 1rem .75rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: fixed;
+			left: -30rem;
+			font-size: 1rem !important;
+			text-align: justify;
+			user-select: none;
+			word-wrap: break-word;
+			overflow-x: hidden;
+			overflow-y: auto;
+			box-shadow: 10px 10px 20px 5px gray;
+			cursor: pointer;
+			transition: .4s ease;
+			z-index: 9999;
+		`;
+		box.innerHTML = text;
+
+		return box;
+	},
+
 	resize(){
 		Notification.queue.forEach(config => {
 			if (config.background){
@@ -165,7 +178,11 @@ const Notification = {
 		const 
 			back = config.back,
 			box = config.box,
-			index = Notification.queue.indexOf(config);
+			index = Notification.queue.some((obj, i) => {
+				if (obj.id == config.id){
+					return i;
+				}
+			});
 
 		let isBackConfig = 0;
 
@@ -205,21 +222,20 @@ const Notification = {
 	},
 
 	bottom(config){
-		const order = Notification.queue.indexOf(config);
-
-		config.box.style.bottom = ((order, queue) => {
-			let totalHeight = 0;
+		config.box.style.bottom = (_ => {
+			let totalHeight = 0,
+				order = Notification.queue.indexOf(config);
 
 			if (order){
 				for (let i = 0; i < order; i++){
-					totalHeight += queue[i].box.offsetHeight + 4;
+					totalHeight +=  Notification.queue[i].box.offsetHeight + 2.5;
 				}
 			}
-			else if (order > -1){
-				return "1px";
+			else{
+				return "2.5px";
 			}
 
 			return `${totalHeight}px`;
-		})(order, Notification.queue);
+		})();
 	}
 };
