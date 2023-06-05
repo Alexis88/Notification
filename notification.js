@@ -60,7 +60,7 @@ const Notification = {
 			Notification.onHide = options.onHide && Notification.isFunction(options.onHide) ? options.onHide : null;
 		}
 
-		Notification.queue = Notification.queue || [];
+		Notification.queue ??= [];
 		const cloneConfig = Notification.createNotification();		
 		Notification.events(cloneConfig);
 	},
@@ -83,13 +83,10 @@ const Notification = {
 		Notification.back = Notification.createBack();
 		Notification.box = Notification.createBox(Notification.text);	
 		const cloneConfig = {...Notification};
+		delete cloneConfig.queue;
 		Notification.queue.push(cloneConfig);
-
-		if (cloneConfig.background){
-			document.body.append(cloneConfig.back);
-		}
+		cloneConfig.background && document.body.append(cloneConfig.back);
 		document.body.append(cloneConfig.box);
-
 		Notification.bottom(cloneConfig);
 
 		setTimeout(_ => {		
@@ -178,11 +175,7 @@ const Notification = {
 		const 
 			back = config.back,
 			box = config.box,
-			index = Notification.queue.some((obj, i) => {
-				if (obj.id == config.id){
-					return i;
-				}
-			});
+			index = Notification.queue.findIndex(obj => obj.id == config.id);
 
 		let isBackConfig = 0;
 
@@ -199,25 +192,26 @@ const Notification = {
 		config.onHide && config.onHide();
 		config.timer && clearTimeout(config.timer);
 
+		Notification.queue.splice(index, 1);
+
+		if (!Notification.queue.length){
+			document.body.style.overflow = "auto";
+		}
+		else{
+			Notification.queue.forEach(boxConfig => {
+				isBackConfig += boxConfig.background ? 1 : 0;
+				Notification.bottom(boxConfig);
+			});
+
+			if (!isBackConfig){
+				document.body.style.overflow = "auto";
+			}
+		}
+
 		setTimeout(_ => {
 			config.background && back.remove();
 			box.remove();
-			config.onHide && config.onHide();
-			Notification.queue.splice(index, 1);
-
-			if (!Notification.queue.length){
-				document.body.style.overflow = "auto";
-			}
-			else{
-				Notification.queue.forEach(boxConfig => {
-					isBackConfig += boxConfig.background ? 1 : 0;
-					Notification.bottom(boxConfig);
-				});
-
-				if (!isBackConfig){
-					document.body.style.overflow = "auto";
-				}
-			}
+			config.onHide && config.onHide();			
 		}, 400);
 	},
 
@@ -226,13 +220,13 @@ const Notification = {
 			let totalHeight = 0,
 				order = Notification.queue.indexOf(config);
 
-			if (order){
+			if (order > -1){
 				for (let i = 0; i < order; i++){
 					totalHeight +=  Notification.queue[i].box.offsetHeight + 2.5;
 				}
 			}
 			else{
-				return "2.5px";
+				totalHeight = Notification.queue[i].box.offsetHeight + 2.5;
 			}
 
 			return `${totalHeight}px`;
