@@ -140,7 +140,7 @@ const Notification = {
 
 		box.style = `
 			background-color: #FFFFEF;
-			width: ${width >= 850 ? "250px" : "200px"};
+			width: ${width >= 850 ? "275px" : "200px"};
 			padding: 1rem .75rem;
 			display: flex;
 			align-items: center;
