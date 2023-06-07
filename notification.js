@@ -31,10 +31,10 @@ const Notification = {
 	/**
 	 * options.text: Texto a mostrar
 	 * options.background: Establece un fondo oscuro detrás de la notificación
-	 * time: Tiempo en el que permanecerá visible la notificación
-	 * keep: Establece que la notificación se muestre permanentemente
-	 * onShow: Llamada de retorno a ejecutarse luego de mostrarse la notificación
-	 * onHide: Llamada de retorno a ejecutarse luego de ocultarse la notificación
+	 * options.time: Tiempo en el que permanecerá visible la notificación
+	 * options.keep: Establece que la notificación se muestre permanentemente
+	 * options.onShow: Llamada de retorno a ejecutarse luego de mostrarse la notificación
+	 * options.onHide: Llamada de retorno a ejecutarse luego de ocultarse la notificación
 	 */
 	msg(options){
 		if (!options || !["[object String]", "[object Object]"].includes(Notification.type(options))){
@@ -77,6 +77,13 @@ const Notification = {
 		config.box.addEventListener("click", _ => Notification.hide(config), false);
 		window.addEventListener("resize", Notification.resize, false);
 		window.addEventListener("orientationchange", Notification.resize, false);
+		window.addEventListener("scroll", _ => {
+			const notifications = document.querySelectorAll("[id^=notificationBack]");
+
+			if (notifications.length){
+				notifications[notifications.length - 1].scrollIntoView();
+			}
+		}, false);
 	},
 
 	createNotification(){
@@ -108,6 +115,7 @@ const Notification = {
 			width = window.innerWidth,
 			height = window.innerHeight;
 
+		back.id = `notificationBack-${Notification.id.substring(Notification.id.indexOf("-") + 1)}`;
 		back.style = `
 			position: absolute;
 			background-color: rgba(0, 0, 0, .6);
@@ -177,8 +185,6 @@ const Notification = {
 			box = config.box,
 			index = Notification.queue.findIndex(obj => obj.id == config.id);
 
-		let isBackConfig = 0;
-
 		config.background && back.animate([
 			{opacity: .6},
 			{opacity: 0}
@@ -194,19 +200,7 @@ const Notification = {
 
 		Notification.queue.splice(index, 1);
 
-		if (!Notification.queue.length){
-			document.body.style.overflow = "auto";
-		}
-		else{
-			Notification.queue.forEach(boxConfig => {
-				isBackConfig += boxConfig.background ? 1 : 0;
-				Notification.bottom(boxConfig);
-			});
-
-			if (!isBackConfig){
-				document.body.style.overflow = "auto";
-			}
-		}
+		Notification.queue.forEach(boxConfig => Notification.bottom(boxConfig));
 
 		setTimeout(_ => {
 			config.background && back.remove();
