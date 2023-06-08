@@ -30,6 +30,12 @@ Notification.msg({
 	```javascript
 	Notification.msg("¡Hola!");
 	```
+
+- Pasando una etiqueta HTML como texto:
+
+	```javascript
+	Notification.msg("<img src='icons/caution.ico' />");
+	```
 	
 - Pasando un texto con contenido HTML:
 
