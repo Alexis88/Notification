@@ -3,6 +3,21 @@
 
 Este *plugin* genera cuadros de notificaciones que muestran el contenido que se haya establecido. No requiere de entornos de conexión segura (HTTPS), como sí sucede con la API Notification de JavaScript, por lo que es una buena alternativa para tales casos.
 
+**Datos permitidos:**
+
+```javascript
+Notification.msg("Cadena de caracteres");
+
+Notification.msg({
+	text: Cualquier cadena de caracteres (puede incluir etiquetas HTML),
+	background: Valor lógico (true o false) que establece si se mostrará un cuadro oscuro de fondo,
+	time: Valor numérico entero que establece el tiempo en milésima de segundo durante el cual se mostrará la notificación (por defecto es 3000),
+	keep: Valor lógico (true o false) que establece si la notificación se mostrará permanentemente o no (por defecto es false),
+	onShow: Función que se ejecutará luego de que se muestre la notificación,
+	onHide: Función que se ejecutará luego de que se oculte la notificación
+});
+```
+
 **Ejemplos de uso:**
 
 - Pasando un texto simple:
