@@ -1,7 +1,12 @@
 # Notification
 **CUADRO DE NOTIFICACIONES DE ESTILO MINIMALISTA**
 
-Este *plugin* genera cuadros de notificaciones que muestran el contenido que se haya establecido. No requiere de entornos de conexión segura (HTTPS), como sí sucede con la API Notification de JavaScript, por lo que es una buena alternativa para tales casos.
+Este *plugin* genera cuadros de notificaciones personalizadas con un estilo minimalista. Algunas de sus características principales:
+
+- No requiere de entornos de conexión segura (HTTPS), como sí sucede con la API Notification de JavaScript, por lo que es una buena alternativa para tales casos.
+- Se pueden mostrar varias notificaciones al mismo tiempo sin que se solapen unas con otras.
+- Se cierran con tan solo pulsar sobre ellas.
+- Se adaptan a las dimensiones del dispositivo (*full responsive*).
 
 **Datos permitidos:**
 
