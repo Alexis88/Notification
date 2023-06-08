@@ -6,7 +6,7 @@ Este *plugin* genera cuadros de notificaciones que muestran el contenido que se 
 **Datos permitidos:**
 
 ```javascript
-Notification.msg("Cadena de caracteres");
+Notification.msg("Cadena de caracteres (puede incluir etiquetas HTML)");
 
 Notification.msg({
 	text: Cualquier cadena de caracteres (puede incluir etiquetas HTML),
