@@ -7,19 +7,19 @@ Ejemplos de uso:
 
 - Pasando un texto simple:
 
-	```
+	```javascript
 	Notification.msg("¡Hola!");
 	```
 	
 - Pasando un texto con contenido HTML:
 
-	```
+	```javascript
 	Notification.msg("<img src='icons/alert.ico' /> Ha ocurrido un error");
 	```
 	
 - Texto simple y llamadas de retorno al momento de mostrar y ocultar la notificación:
 
-	```
+	```javascript
 	Notification.msg({
 		text: "¡Hola!",
 		onShow: _ => console.log("La notificación se está mostrando")
@@ -30,7 +30,7 @@ Ejemplos de uso:
 	
 - Texto simple y fondo oscuro:
 
-	```
+	```javascript
 	Notification.msg({
 		text: "¡Hola!",
 		background: true
@@ -39,7 +39,7 @@ Ejemplos de uso:
 
 - Texto simple, fondo oscuro y establecimiento de 5 segundos de visualización de la notificación:
 
-	```
+	```javascript
 	Notification.msg({
 		text: "¡Hola!",
 		background: true,
@@ -49,7 +49,7 @@ Ejemplos de uso:
 
 - Texto simple y tiempo de visualización indefinido (la notificación no se ocultará hasta que se pulse sobre ella):
 	
-	```
+	```javascript
 	Notification.msg({
 		text: "¡Hola!",
 		keep: true
@@ -58,7 +58,7 @@ Ejemplos de uso:
 
 - Notificaciones anidadas al momento de mostrar y ocultar la notificación inicial:
 
-	```
+	```javascript
 	Notification.msg({
 		text: "Este es un ejemplo de notificaciones anidadas",
 		onShow: Notification.msg("Se está mostrando la notificación"),
