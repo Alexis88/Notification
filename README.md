@@ -1,4 +1,4 @@
-# Notification
+# Notification.js
 **CUADRO DE NOTIFICACIONES DE ESTILO MINIMALISTA**
 
 Este *plugin* genera cuadros de notificaciones personalizadas con un estilo minimalista. Algunas de sus características principales:
