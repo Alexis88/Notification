@@ -14,7 +14,8 @@ Ejemplos de uso:
 - Pasando un objeto con opciones:
  	
 	//Texto simple y llamadas de retorno al momento de mostrar y ocultar la notificación
- 	Notification.msg({
+ 	
+	Notification.msg({
  		text: "¡Hola!",
  		onShow: _ => console.log("La notificación se está mostrando")
  		onHide: _ => console.log("La notificación se ha ocultado");
