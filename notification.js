@@ -41,23 +41,24 @@ const Notification = {
 			throw new Error("Tiene que establecer un contenido para la notificación");
 		}
 
-		Notification.id = `notificationID-${new Date().getTime()}`;
+		Notification.options = {};
+		Notification.options.id = `notificationID-${new Date().getTime()}`;
 
 		if (Notification.type(options) == "[object String]"){
-			Notification.text = options;
-			Notification.background = false;
-			Notification.time = 3000;
-			Notification.keep = false;
-			Notification.onShow = null;
-			Notification.onHide = null;
+			Notification.options.text = options;
+			Notification.options.background = false;
+			Notification.options.time = 3000;
+			Notification.options.keep = false;
+			Notification.options.onShow = null;
+			Notification.options.onHide = null;
 		}
 		else{
-			Notification.text = options.text;
-			Notification.background = options.background || false;
-			Notification.time = options.time || 3000;
-			Notification.keep = options.keep || false;
-			Notification.onShow = options.onShow && Notification.isFunction(options.onShow) ? options.onShow : null;
-			Notification.onHide = options.onHide && Notification.isFunction(options.onHide) ? options.onHide : null;
+			Notification.options.text = options.text;
+			Notification.options.background = options.background || false;
+			Notification.options.time = options.time || 3000;
+			Notification.options.keep = options.keep || false;
+			Notification.options.onShow = options.onShow && Notification.isFunction(options.onShow) ? options.onShow : null;
+			Notification.options.onHide = options.onHide && Notification.isFunction(options.onHide) ? options.onHide : null;
 		}
 
 		Notification.queue ??= [];
@@ -87,9 +88,9 @@ const Notification = {
 	},
 
 	createNotification(){
-		Notification.back = Notification.createBack();
-		Notification.box = Notification.createBox(Notification.text);	
-		const cloneConfig = {...Notification};
+		Notification.options.back = Notification.createBack();
+		Notification.options.box = Notification.createBox(Notification.options.text);	
+		const cloneConfig = {...Notification.options};
 		delete cloneConfig.queue;
 		Notification.queue.push(cloneConfig);
 		cloneConfig.background && document.body.append(cloneConfig.back);
@@ -103,7 +104,7 @@ const Notification = {
 		}, 400);
 
 		if (!cloneConfig.keep){
-			cloneConfig.timer = setTimeout(_ => cloneConfig.hide(cloneConfig), cloneConfig.time);
+			cloneConfig.timer = setTimeout(_ => Notification.hide(cloneConfig), cloneConfig.time);
 		}
 
 		return cloneConfig;
@@ -115,7 +116,7 @@ const Notification = {
 			width = window.innerWidth,
 			height = window.innerHeight;
 
-		back.id = `notificationBack-${Notification.id.substring(Notification.id.indexOf("-") + 1)}`;
+		back.id = `notificationBack-${Notification.options.id.substring(Notification.options.id.indexOf("-") + 1)}`;
 		back.style = `
 			position: absolute;
 			background-color: rgba(0, 0, 0, .6);
