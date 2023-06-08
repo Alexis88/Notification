@@ -3,7 +3,7 @@
 
 Este *plugin* genera cuadros de notificaciones que muestran el contenido que se haya establecido. No requieren de entornos de conexión segura (HTTPS), como sí sucede con la API Notification de JavaScript, por lo que son una alternativa para tales casos.
 
-Ejemplos de uso:
+**Ejemplos de uso:**
 
 - Pasando un texto simple:
 
