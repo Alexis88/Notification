@@ -12,7 +12,8 @@ Ejemplos de uso:
  	Notification.msg("&lt;img src='icons/alert.ico' /&gt; Ha ocurrido un error");
 	
 - Pasando un objeto con opciones:
- 	//Texto simple y llamadas de retorno al momento de mostrar y ocultar la notificación
+ 	
+	//Texto simple y llamadas de retorno al momento de mostrar y ocultar la notificación
  	Notification.msg({
  		text: "¡Hola!",
  		onShow: _ => console.log("La notificación se está mostrando")
