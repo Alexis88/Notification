@@ -8,7 +8,7 @@ Este *plugin* genera cuadros de notificaciones personalizadas con un estilo mini
 - Se cierran con tan solo pulsar sobre ellas.
 - Se adaptan a las dimensiones del dispositivo (*full responsive*).
 
-**Datos permitidos:**
+# Datos permitidos:
 
 ```javascript
 Notification.msg("Cadena de caracteres (puede incluir etiquetas HTML)");
@@ -23,7 +23,7 @@ Notification.msg({
 });
 ```
 
-**Ejemplos de uso:**
+# Ejemplos de uso:
 
 - Pasando un texto simple:
 
