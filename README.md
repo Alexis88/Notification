@@ -11,8 +11,10 @@ Este *plugin* genera cuadros de notificaciones personalizadas con un estilo mini
 # Datos permitidos:
 
 ```javascript
+//Cadena de caracteres
 Notification.msg("Cadena de caracteres (puede incluir etiquetas HTML)");
 
+//Objeto literal con opciones de configuración
 Notification.msg({
 	text: Cualquier cadena de caracteres (puede incluir etiquetas HTML),
 	background: Valor lógico (true o false) que establece si se mostrará un cuadro oscuro de fondo,
