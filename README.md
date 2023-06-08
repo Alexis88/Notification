@@ -9,7 +9,7 @@ Ejemplos de uso:
  	Notification.msg("¡Hola!");
 	
 - Pasando un texto con contenido HTML:
- 	Notification.msg("<img src='icons/alert.ico' /> Ha ocurrido un error");
+ 	Notification.msg("&lt;img src='icons/alert.ico' /&gt; Ha ocurrido un error");
 	
 - Pasando un objeto con opciones:
  	//Texto simple y llamadas de retorno al momento de mostrar y ocultar la notificación
