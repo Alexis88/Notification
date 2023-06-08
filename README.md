@@ -22,8 +22,8 @@ Ejemplos de uso:
 	```javascript
 	Notification.msg({
 		text: "¡Hola!",
-		onShow: _ => console.log("La notificación se está mostrando")
-		onHide: _ => console.log("La notificación se ha ocultado");
+		onShow: _ => console.log("La notificación se está mostrando"),
+		onHide: _ => console.log("La notificación se ha ocultado")
 	});
 	```
 	
