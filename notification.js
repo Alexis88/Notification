@@ -75,7 +75,10 @@ const Notification = {
 	},
 
 	events(config){
-		config.box.addEventListener("click", _ => Notification.hide(config), false);
+		config.box.addEventListener("click", _ => {
+			clearTimeout(config.timer);
+			Notification.hide(config);
+		}, false);
 		window.addEventListener("resize", Notification.resize, false);
 		window.addEventListener("orientationchange", Notification.resize, false);
 		window.addEventListener("scroll", _ => {
@@ -194,13 +197,9 @@ const Notification = {
 		box.animate([
 			{left: 0},
 			{left: "-30rem"}
-		], {duration: 400, fill: "forwards"});
-
-		config.onHide && config.onHide();
-		config.timer && clearTimeout(config.timer);
+		], {duration: 400, fill: "forwards"});	
 
 		Notification.queue.splice(index, 1);
-
 		Notification.queue.forEach(boxConfig => Notification.bottom(boxConfig));
 
 		setTimeout(_ => {
