@@ -17,7 +17,7 @@ Notification.msg("Cadena de caracteres (puede incluir etiquetas HTML)");
 //Objeto literal con opciones de configuración
 Notification.msg({
 	text: Cualquier cadena de caracteres (puede incluir etiquetas HTML),
-	background: Valor lógico (true o false) que establece si se mostrará un cuadro oscuro de fondo,
+	background: Valor lógico (true o false) que establece si se mostrará un cuadro oscuro de fondo (por defecto es false),
 	time: Valor numérico entero que establece el tiempo en milésimas de segundo durante el cual se mostrará la notificación (por defecto es 3000),
 	keep: Valor lógico (true o false) que establece si la notificación se mostrará permanentemente o no (por defecto es false),
 	onShow: Función que se ejecutará luego de que se muestre la notificación,
