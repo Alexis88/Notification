@@ -53,12 +53,12 @@ const Notification = {
 			Notification.options.onHide = null;
 		}
 		else{
-			Notification.options.text = options.text;
-			Notification.options.background = options.background || false;
-			Notification.options.time = options.time || 3000;
-			Notification.options.keep = options.keep || false;
-			Notification.options.onShow = options.onShow && Notification.isFunction(options.onShow) ? options.onShow : null;
-			Notification.options.onHide = options.onHide && Notification.isFunction(options.onHide) ? options.onHide : null;
+			Notification.options.text = options.text && Notification.type(options.text, "string") ? options.text : "No se ha establecido un mensaje";
+			Notification.options.background = options.background && Notification.type(options.background, "boolean") ? options.background : false;
+			Notification.options.time = options.time && Notification.type(options.time, "number") ? options.time : 3000;
+			Notification.options.keep = options.keep && Notification.type(options.keep, "boolean") ? options.keep : false;
+			Notification.options.onShow = options.onShow && Notification.type(options.onShow, "function") ? options.onShow : null;
+			Notification.options.onHide = options.onHide && Notification.type(options.onHide, "function") ? options.onHide : null;
 		}
 
 		Notification.queue ??= [];
@@ -66,12 +66,11 @@ const Notification = {
 		Notification.events(cloneConfig);
 	},
 
-	type(elem){
+	type(elem, type){
+		if (type){
+			return {}.toString.call(elem).toLowerCase() === `[object ${type}]`.toLowerCase();
+		}
 		return {}.toString.call(elem);
-	},
-
-	isFunction(fn){
-		return Notification.type(fn) === "[object Function]";
 	},
 
 	events(config){
