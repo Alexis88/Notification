@@ -37,7 +37,7 @@ const Notification = {
 	 * options.onHide: Llamada de retorno a ejecutarse luego de ocultarse la notificación
 	 */
 	msg(options){
-		if (!options || !["[object String]", "[object Object]"].includes(Notification.type(options))){
+		if (!options || !["[object String]", "[object Object]"].includes(Notification.type(options)) || (Notification.type(options, "object") && !Object.keys(options).length)){
 			throw new Error("Tiene que establecer un contenido para la notificación");
 		}
 
@@ -53,12 +53,12 @@ const Notification = {
 			Notification.options.onHide = null;
 		}
 		else{
-			Notification.options.text = options.text && Notification.type(options.text, "string") ? options.text : "No se ha establecido un mensaje";
-			Notification.options.background = options.background && Notification.type(options.background, "boolean") ? options.background : false;
-			Notification.options.time = options.time && Notification.type(options.time, "number") ? options.time : 3000;
-			Notification.options.keep = options.keep && Notification.type(options.keep, "boolean") ? options.keep : false;
-			Notification.options.onShow = options.onShow && Notification.type(options.onShow, "function") ? options.onShow : null;
-			Notification.options.onHide = options.onHide && Notification.type(options.onHide, "function") ? options.onHide : null;
+			Notification.options.text = Notification.type(options.text, "string") ? options.text : "No se ha establecido un mensaje";
+			Notification.options.background = Notification.type(options.background, "boolean") ? options.background : false;
+			Notification.options.time = Notification.type(options.time, "number") ? options.time : 3000;
+			Notification.options.keep = Notification.type(options.keep, "boolean") ? options.keep : false;
+			Notification.options.onShow = Notification.type(options.onShow, "function") ? options.onShow : null;
+			Notification.options.onHide = Notification.type(options.onHide, "function") ? options.onHide : null;
 		}
 
 		Notification.queue ??= [];
