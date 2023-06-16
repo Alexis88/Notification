@@ -67,10 +67,7 @@ const Notification = {
 	},
 
 	type(elem, type){
-		if (type){
-			return {}.toString.call(elem).toLowerCase() === `[object ${type}]`.toLowerCase();
-		}
-		return {}.toString.call(elem);
+		return type ? {}.toString.call(elem).toLowerCase() === `[object ${type}]`.toLowerCase() : {}.toString.call(elem);
 	},
 
 	events(config){
