@@ -97,7 +97,7 @@ const Notification = {
 		Notification.bottom(cloneConfig);
 
 		setTimeout(_ => {		
-			cloneConfig.back.style.opacity = .6;
+			cloneConfig.back.style.backgroundColor = "rgba(0, 0, 0, .6)";
 			cloneConfig.box.style.left = 0;			
 			cloneConfig.onShow && cloneConfig.onShow();
 		}, 400);
@@ -118,7 +118,7 @@ const Notification = {
 		back.id = `notificationBack-${Notification.options.id.substring(Notification.options.id.indexOf("-") + 1)}`;
 		back.style = `
 			position: absolute;
-			background-color: rgba(0, 0, 0, .6);
+			background-color: rgba(0, 0, 0, 0);
 			display: flex;
 			align-items: center;
 			width: ${width}px;
