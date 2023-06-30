@@ -158,7 +158,7 @@ const Notification = {
 			transition: .4s ease;
 			z-index: 9999;
 		`;
-		box.innerHTML = text;
+		box.innerHTML = text.replace(/<script(\s.*)?>(.*)?<\/script>/gi, "");
 
 		return box;
 	},
